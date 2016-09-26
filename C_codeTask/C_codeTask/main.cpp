@@ -2,8 +2,8 @@
 //  main.cpp
 //  C_codeTask
 //
-//  Created by Kris on 9/26/16.
-//  Copyright © 2016 Kris. All rights reserved.
+//  Created by Cheng Peng on 9/26/16.
+//  Copyright © 2016 Cheng Peng. All rights reserved.
 //
 
 #include <iostream>
