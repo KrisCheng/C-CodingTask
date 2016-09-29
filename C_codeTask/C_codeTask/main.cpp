@@ -4,90 +4,61 @@
 //  Copyright © 2016 Cheng Peng. All rights reserved.
 
 /*
- This class is used to calculate all the numbers between 1 and 10,000,000 that are the product of two distinct primes.
+ This class is used to calculate all the numbers between 1 and 10,000,000 that are the product of two distinct primes(call semiprimes for short,but remove those numbers that producted by two same numbers).
  The space complexity of this method is O(n), the time complexity of this method is also O(n).
- 
  */
+
 #include <iostream>
 #include<vector>
 #include<math.h>
 using namespace std;
 
-const int MAXN=5000001;
-int prime[MAXN];//保存素数
-bool vis[MAXN];//初始化
-int Prime(int n)
+const int MAXN=1e7;
+bool vis[MAXN/2];//the array for judge whether a number is a prime.
+
+/*this function is to get all the primes to n, which is based on Euler function.*/
+vector<int> getPrimes(int n)
 {
+    vector<int> primes;
     int cnt=0;
     memset(vis,0,sizeof(vis));
     for(int i=2;i<n;i++)
     {
         if(!vis[i])
         {
-            prime[cnt++]=i;
-            printf("%zd\n", i);//打印素数
+            cnt++;
+            primes.push_back(i);//store the primes.
         }
-        for(int j=0;j<cnt&&i*prime[j]<n;j++)
+        for(int j=0;j<cnt&&i*primes[j]<n;j++)
         {
-            vis[i*prime[j]]=1;
-            if(i%prime[j]==0)//关键
+            vis[i*primes[j]]=1;
+            if(i%primes[j]==0)//key process,which means i*primes[j+1] is filtered by N*primes[j],no filter anymore.
             {
                 break;
             }
         }
     }
-    return cnt;//返回小于n的素数的个数
+    return primes;//return all the primes from 2 to n.
 }
 
-bool IsPrime(unsigned n)
-{
-    if (n<2)
-    {//小于2的数即不是合数也不是素数
-        throw 0;
+int main() {
+    //1.get all the primes from 2 to 5e6.
+    vector<int> primes = getPrimes(MAXN/2);
+    //2.get all the semiprimes from 2 to 1e7.
+    vector<vector<int>> semiprimes;
+    for (int i = 0; i < primes.size() && primes[i] < sqrt(MAXN); ++i)
+    {
+        for (int j = i+1; j < primes.size() && primes[i] * primes[j] < MAXN; ++j)
+            {
+                semiprimes.push_back({primes[i] * primes[j],primes[i],primes[j]});
+            }
     }
-    for(unsigned i=2;i<n/2+1;++i)
-    { // 和比它的一半小数相除，如果都除不尽，证明素数
-        if ( 0 == n % i )
-        { // 除尽了，合数
-            return false;
-        }
+    //3. sort the semiprimes.
+    sort(semiprimes.begin(),semiprimes.end());
+    for(int i = 0; i < semiprimes.size(); i ++)
+    {
+       cout<<semiprimes[i][0]<<'='<<semiprimes[i][1]<<'*'<<semiprimes[i][2]<<'\n';
     }
-    return true; // 都没除尽，素数
-}
-
-/*the function to get all the primes until n*/
-vector<int> getPrimes(int n){
-    vector<int> primes = {};
-    for(int i = 2; i < n/2; i ++){
-        if(IsPrime(i)){
-            primes.push_back(i);
-        }
-    }
-    return primes;
-}
-
-int main(int argc, const char * argv[]) {
-    // insert code here...
-    /*
-     int max = 1e3;
-     vector<int> primes = getPrimes(max/2);
-     printf("%zd\n", primes.size());
-     for(int o = 0; o < primes.size(); o++){
-     //    printf("%zd\n", primes[o]);
-     }
-     printf("\n\n***************\n\n");
-     vector<int> biprimes;
-     for (int i = 0; i < primes.size() && primes[i] < sqrt(max); ++i) {
-     for (int j = i; j < primes.size() && primes[i] * primes[j] < max; ++j) {
-     if(primes[i] == primes[j]){
-     continue;
-     }
-     biprimes.push_back(primes[i] * primes[j]);
-     printf("%zd = %zd * %zd\n", primes[i] * primes[j],primes[i],primes[j]);
-     }
-     }
-     printf("%zd\n", biprimes.size());
-     */
-    Prime(5000000);
+    cout<<"count of all the numbers:"<<semiprimes.size()+'\n';
     return 0;
 }
